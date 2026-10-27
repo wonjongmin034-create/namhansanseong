@@ -94,6 +94,21 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
 .pics figure{margin:0;background:var(--paper);border:1px solid var(--line);padding:10px;min-width:0}
 .pics svg{width:100%;height:auto;display:block;border-radius:4px}
 .pics figcaption{font-family:var(--display);font-size:20px;margin-top:6px}
+.orgwrap{margin-top:22px;display:grid;gap:12px}
+.otitle{font-family:var(--display);font-weight:400;font-size:22px}
+.orgs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.orgs{grid-template-columns:1fr}}
+.org{background:var(--paper);border:1px solid var(--line);border-top:5px solid var(--muted);border-radius:10px;padding:12px 14px;display:grid;gap:10px;align-content:start;min-width:0}
+.org.ju{border-top-color:var(--ju)} .org.cheok{border-top-color:var(--cheok)}
+.org h4{margin:0;font-family:var(--display);font-weight:400;font-size:22px}
+.orow{display:grid;gap:5px;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.orow.right{border-color:var(--ok)} .orow.wrong,.orow.none{border-color:var(--bad)}
+.oq{font-size:14px;color:var(--muted)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts button{font:inherit;font-size:15px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;line-height:1.3;text-align:left}
+.opts button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.omark{font-size:13px} .orow.right .omark{color:var(--ok)} .orow.wrong .omark,.orow.none .omark{color:var(--bad)}
+.osum{margin:0;background:var(--bg);border-left:4px solid var(--ok);padding:8px 12px;font-family:var(--news);font-size:16px;line-height:1.7}
 /* 분류 */
 .sort{display:grid;gap:10px}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
@@ -218,14 +233,14 @@ section[hidden]{display:none}
     </div>
 
 
-    <div class="qs" id="qs"></div>
+    <div class="orgwrap" id="org_papers"></div>
   </section>
 
   <!-- 2단계 -->
   <section id="step2" hidden>
     <div class="lead">
       <h2>그림도 관점을 말해요</h2>
-      <p>같은 산성을 그린 두 그림이에요. 색, 크기, 사람들의 모습을 비교하며 그린 사람의 생각(관점)을 찾아 <b>직접 써 보세요</b>.</p>
+      <p>같은 산성을 그린 두 그림이에요. 색, 크기, 사람들의 모습을 비교하고, 그림에 담긴 <b>관점을 골라 정리</b>해 보세요.</p>
     </div>
     <div class="pics" id="pics">
       <figure>
@@ -237,7 +252,7 @@ section[hidden]{display:none}
         <figcaption>그림 ㉯</figcaption>
       </figure>
     </div>
-    <div class="qs" id="pq"></div>
+    <div class="orgwrap" id="org_pics"></div>
 
   </section>
 
@@ -416,30 +431,56 @@ $("#resetFind").onclick=()=>{
   step1.querySelectorAll(".clue").forEach(c=>c.classList.remove("found","missed"));
   countFind();
 };
-const MEDIA=["산성일보","대의신문"];
-const Q=[
- ["제목","제목은 각각 무엇을 강조하나요?","백성을 살리는 길이 열렸다는 희망","오랑캐에게 굽히는 부끄러움"],
- ["낱말","같은 상황을 어떤 낱말로 표현했나요?","‘청나라’, ‘화친’처럼 차분한 낱말","‘오랑캐’, ‘머리를 숙이다’처럼 강한 낱말"],
- ["인터뷰","누구의 말을 실었나요?","최명길, 집에 가고 싶은 병사","김상헌, 버티자는 장수"],
- ["그림","그림은 어떤 느낌을 주나요?","추위에 떠는 병사 → 빨리 끝내야 한다","당당한 장수 → 아직 싸울 수 있다"],
- ["빠진 내용","말하지 않은 것은 무엇일까요?","도와주러 올 군사 이야기가 없다","춥고 배고픈 모습은 짧게만 썼다"]
-];
-const P=[
- ["색·분위기","두 그림의 색과 분위기는 어떻게 다른가요?","어둡고 차가운 회색 → 춥고 힘든 느낌","밝은 하늘과 붉은 깃발 → 힘차고 당당한 느낌"],
- ["크기·자리","크게 그린 것과 작게 그린 것은 무엇인가요?","성벽은 작고 낮게, 사람들은 가까이 그렸다","성벽과 장수를 크게 그려서 올려다보게 했다"],
- ["사람들","사람들은 어떤 모습인가요?","웅크리고 모여 앉아 있다","곧게 서서 앞을 바라본다"],
- ["어느 신문?","각 그림은 어느 신문에 실렸을까요? 왜 그렇게 생각했나요?","산성일보(주화파) — 배고프고 힘든 모습을 강조","대의신문(척화파) — 굳세게 버티는 모습을 강조"],
- ["빠진 것","그림에 담기지 않은 것은 무엇일까요?","싸우려는 의지, 도와주러 올 군사","굶주리고 지친 사람들의 모습"]
-];
-function qHTML(list,labels,lcls,pre){
-  return list.map((q,qi)=>`<div class="q"><span class="tag">${q[0]}</span><p>${q[1]}</p>
-<div class="ins">${labels.map((m,mi)=>`<div><label class="${lcls[mi]}" for="${pre}${qi}_${mi}">${m}</label><textarea class="t${mi+1}" id="${pre}${qi}_${mi}" rows="2" placeholder="여기에 입력하세요"></textarea></div>`).join("")}</div>
-<details><summary>도움말 보기 (예시 답)</summary><div class="ans">${labels.map((m,mi)=>`<div class="a${mi+1}"><b>${m}</b>${q[2+mi]}</div>`).join("")}</div></details></div>`).join("");
+/* 관점 정리 (골라서 정리하기) */
+const ORG={
+ papers:{title:"각 신문의 관점 정리하기",groups:[
+  {name:"산성일보",cls:"ju",rows:[
+   {q:"어떤 편일까요?",o:["주화파 (화친으로 백성을 살리자)","척화파 (끝까지 싸워 지키자)"],a:0},
+   {q:"제목이 강조한 것",o:["오랑캐에게 굽히는 부끄러움","백성을 살릴 길(희망)"],a:1},
+   {q:"쓴 낱말의 느낌",o:["강하고 거친 낱말","차분하고 부드러운 낱말"],a:1},
+   {q:"인터뷰한 사람",o:["최명길, 집에 가고 싶은 병사","김상헌, 버티자는 장수"],a:0},
+   {q:"빼놓은 이야기",o:["춥고 배고픈 모습","도와주러 올 군사 이야기"],a:1}],
+   sum:"산성일보는 주화파 편이에요. 백성의 목숨을 먼저 생각해서 차분한 낱말로 쓰고, 도와주러 올 군사 이야기는 빼놓았어요."},
+  {name:"대의신문",cls:"cheok",rows:[
+   {q:"어떤 편일까요?",o:["주화파 (화친으로 백성을 살리자)","척화파 (끝까지 싸워 지키자)"],a:1},
+   {q:"제목이 강조한 것",o:["오랑캐에게 굽히는 부끄러움","백성을 살릴 길(희망)"],a:0},
+   {q:"쓴 낱말의 느낌",o:["차분하고 부드러운 낱말","강하고 거친 낱말"],a:1},
+   {q:"인터뷰한 사람",o:["최명길, 집에 가고 싶은 병사","김상헌, 버티자는 장수"],a:1},
+   {q:"빼놓은 이야기",o:["춥고 배고픈 모습","도와주러 올 군사 이야기"],a:0}],
+   sum:"대의신문은 척화파 편이에요. 나라의 자존심을 먼저 생각해서 강한 낱말로 쓰고, 춥고 배고픈 모습은 짧게만 썼어요."}]},
+ pics:{title:"그림에 담긴 관점 정리하기",groups:[
+  {name:"그림 ㉮",cls:"",rows:[
+   {q:"색과 분위기",o:["어둡고 차가워서 힘든 느낌","밝고 힘차서 당당한 느낌"],a:0},
+   {q:"크게 그린 것",o:["성벽과 장수","사람들의 모습과 빈 솥"],a:1},
+   {q:"사람들의 모습",o:["웅크리고 모여 앉아 있다","곧게 서서 앞을 본다"],a:0},
+   {q:"그림에 담긴 관점",o:["척화파 (끝까지 싸워 지키자)","주화파 (화친으로 백성을 살리자)"],a:1},
+   {q:"어느 신문에 실렸을까요?",o:["산성일보","대의신문"],a:0}],
+   sum:"그림 ㉮는 산성일보에 어울려요. 춥고 배고픈 사람들을 크게 보여 줘서 ‘백성을 살리려면 싸움을 빨리 끝내야 한다’는 관점이 드러나요."},
+  {name:"그림 ㉯",cls:"",rows:[
+   {q:"색과 분위기",o:["밝고 힘차서 당당한 느낌","어둡고 차가워서 힘든 느낌"],a:0},
+   {q:"크게 그린 것",o:["사람들의 모습과 빈 솥","성벽과 장수"],a:1},
+   {q:"사람들의 모습",o:["웅크리고 모여 앉아 있다","곧게 서서 앞을 본다"],a:1},
+   {q:"그림에 담긴 관점",o:["척화파 (끝까지 싸워 지키자)","주화파 (화친으로 백성을 살리자)"],a:0},
+   {q:"어느 신문에 실렸을까요?",o:["산성일보","대의신문"],a:1}],
+   sum:"그림 ㉯는 대의신문에 어울려요. 높은 성벽과 당당한 장수를 크게 보여 줘서 ‘아직 싸울 수 있다’는 관점이 드러나요. 두 그림 모두 눈 덮인 산성과 멀리 보이는 천막은 똑같이 그렸어요."}]}
+};
+const orgState={papers:{},pics:{}}, orgChecked={papers:false,pics:false};
+function renderOrg(key){
+  const o=ORG[key], st=orgState[key], ck=orgChecked[key]; let ok=0,total=0;
+  const cards=o.groups.map((g,gi)=>`<div class="org ${g.cls}"><h4>${g.name}</h4>${g.rows.map((r,ri)=>{
+    const sel=st[gi+"_"+ri]; total++; const right=sel===r.a; if(ck&&right) ok++;
+    return `<div class="orow${ck?(sel==null?" none":right?" right":" wrong"):""}"><div class="oq">${r.q}</div><div class="opts">${r.o.map((t,oi)=>`<button type="button" data-k="${key}" data-g="${gi}" data-r="${ri}" data-o="${oi}" aria-pressed="${sel===oi}">${t}</button>`).join("")}</div>${ck?`<span class="omark">${sel==null?"골라 보세요":right?"✓ 맞았어요":"✗ 다시 생각해요"}</span>`:""}</div>`}).join("")}${ck?`<p class="osum">${g.sum}</p>`:""}</div>`).join("");
+  $("#org_"+key).innerHTML=`<div class="row" style="justify-content:space-between"><b class="otitle">${o.title}</b><span class="row"><span class="score" aria-live="polite">${ck?`${total}개 중 ${ok}개`:""}</span><button class="btn solid" type="button" data-act="check" data-k="${key}">확인하기</button><button class="btn" type="button" data-act="reset" data-k="${key}">다시 하기</button></span></div><div class="orgs">${cards}</div>`;
 }
-const qHead=h=>`<div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:400;font-size:22px">${h}</b><button class="btn clearQs" type="button">답 모두 지우기</button></div>`;
-$("#qs").innerHTML=qHead("매체 비교하기 — 직접 써 보세요")+qHTML(Q,MEDIA,["l1","l2"],"ans");
-$("#pq").innerHTML=qHead("그림 비교하기 — 직접 써 보세요")+qHTML(P,["그림 ㉮","그림 ㉯"],["l0","l0"],"pic");
-document.querySelectorAll(".clearQs").forEach(b=>b.onclick=()=>{if(confirm("쓴 답을 모두 지울까요?")) b.closest(".qs").querySelectorAll("textarea").forEach(x=>x.value="")});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-k]"); if(!b) return;
+  const key=b.dataset.k;
+  if(b.dataset.act==="check") orgChecked[key]=true;
+  else if(b.dataset.act==="reset"){orgState[key]={}; orgChecked[key]=false}
+  else{orgState[key][b.dataset.g+"_"+b.dataset.r]=+b.dataset.o; orgChecked[key]=false}
+  renderOrg(key);
+});
+renderOrg("papers"); renderOrg("pics");
 
 /* 2단계 그림: 같은 장면(눈 덮인 산성)을 두 가지 관점으로 그려요 */
 function sceneSVG(k){
@@ -631,8 +672,7 @@ renderVote();
 /* 자동 저장 (이 기기의 브라우저에만 저장돼요) */
 const SAVE_KEY="namhan-gwanjeom-v1";
 function collect(){
-  const ta={}; document.querySelectorAll("#qs textarea,#pq textarea").forEach(x=>{if(x.value) ta[x.id]=x.value});
-  return {ta,picks,role,name:$("#paperName").value,head:$("#headline").value,body:$("#body").value};
+  return {org:orgState,picks,role,name:$("#paperName").value,head:$("#headline").value,body:$("#body").value};
 }
 let saveTimer;
 function saveNow(){
@@ -643,7 +683,7 @@ function saveNow(){
 }
 function restore(){
   let d; try{d=JSON.parse(localStorage.getItem(SAVE_KEY)||"null")}catch(e){} if(!d) return;
-  Object.entries(d.ta||{}).forEach(([id,v])=>{const x=document.getElementById(id); if(x) x.value=v});
+  if(d.org){orgState.papers=d.org.papers||{}; orgState.pics=d.org.pics||{}; renderOrg("papers"); renderOrg("pics")}
   picks=d.picks||{}; renderSort();
   if(ROLES[d.role]) setRole(d.role);
   $("#paperName").value=d.name||""; $("#headline").value=d.head||""; $("#body").value=d.body||"";
